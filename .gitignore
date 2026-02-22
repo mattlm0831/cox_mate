@@ -50,7 +50,7 @@ keys
 keys.json
 *.key
 *.keys
-validation_images/*.png
+validation_images/
 validation_images/*.jpg
 validation_images/*.jpeg
 optimized_prompt.txt
