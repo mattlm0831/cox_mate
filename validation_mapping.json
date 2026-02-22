@@ -1,0 +1,176 @@
+[
+	{
+		"image_path": "validation_images/cox_drop_twisted_bow.png",
+		"description": "Screenshot showing Twisted bow drop from regular Chambers",
+		"expected_drops": [
+			{
+				"item": "Twisted bow",
+				"quantity": 1,
+				"confidence": "high",
+				"is_purple": true
+			}
+		],
+		"expected_points": 35000,
+		"raid_type": "regular",
+		"completion_count": 125,
+		"date_completed": "2024-02-15T14:30:45",
+		"notes": "Clear purple drop with good visibility, standard UI layout",
+		"difficulty": "easy"
+	},
+	{
+		"image_path": "validation_images/cox_drop_dragon_claws.png",
+		"description": "Screenshot showing Dragon claws drop with regular loot",
+		"expected_drops": [
+			{
+				"item": "Dragon claws",
+				"quantity": 1,
+				"confidence": "high",
+				"is_purple": true
+			},
+			{
+				"item": "Teak plank",
+				"quantity": 15,
+				"confidence": "high",
+				"is_purple": false
+			}
+		],
+		"expected_points": 28500,
+		"raid_type": "regular",
+		"completion_count": 200,
+		"date_completed": "2024-02-17T21:45:33",
+		"notes": "Purple drop with additional regular loot items",
+		"difficulty": "medium"
+	},
+	{
+		"image_path": "validation_images/cox_no_drop.png",
+		"description": "Screenshot with no special drops, only regular loot",
+		"expected_drops": [
+			{
+				"item": "Teak plank",
+				"quantity": 20,
+				"confidence": "high"
+			},
+			{
+				"item": "Mahogany plank",
+				"quantity": 10,
+				"confidence": "high"
+			},
+			{
+				"item": "Dynamite",
+				"quantity": 5,
+				"confidence": "medium"
+			}
+		],
+		"expected_points": 22000,
+		"raid_type": "regular",
+		"completion_count": 89,
+		"date_completed": "2024-02-12T16:22:11",
+		"notes": "Standard loot, no purple drops - good for testing false positive rate",
+		"difficulty": "medium"
+	},
+	{
+		"image_path": "validation_images/cox_cm_ancestral.png",
+		"description": "Challenge Mode with Ancestral hat drop",
+		"expected_drops": [
+			{
+				"item": "Ancestral hat",
+				"quantity": 1,
+				"confidence": "high"
+			},
+			{
+				"item": "Dark relic",
+				"quantity": 1,
+				"confidence": "high"
+			}
+		],
+		"expected_points": 42000,
+		"raid_type": "cm",
+		"completion_count": 67,
+		"date_completed": "2024-02-16T09:15:22",
+		"notes": "Challenge Mode purple drop with CM-specific loot",
+		"difficulty": "easy"
+	},
+	{
+		"image_path": "validation_images/cox_elder_maul.png",
+		"description": "Elder maul drop from regular raid",
+		"expected_drops": [
+			{
+				"item": "Elder maul",
+				"quantity": 1,
+				"confidence": "high"
+			}
+		],
+		"expected_points": 31200,
+		"raid_type": "regular",
+		"completion_count": 156,
+		"date_completed": "2024-02-18T13:45:12",
+		"notes": "Another purple drop for diversity in testing",
+		"difficulty": "easy"
+	},
+	{
+		"image_path": "validation_images/cox_multiple_drops.png",
+		"description": "Multiple items including prayer scrolls",
+		"expected_drops": [
+			{
+				"item": "Dexterous prayer scroll",
+				"quantity": 1,
+				"confidence": "high"
+			},
+			{
+				"item": "Teak plank",
+				"quantity": 25,
+				"confidence": "high"
+			},
+			{
+				"item": "Mahogany plank",
+				"quantity": 12,
+				"confidence": "high"
+			}
+		],
+		"expected_points": 26800,
+		"raid_type": "regular",
+		"completion_count": 78,
+		"date_completed": "2024-02-14T20:33:45",
+		"notes": "Prayer scroll drop with multiple regular items",
+		"difficulty": "hard"
+	},
+	{
+		"image_path": "validation_images/cox_low_points.png",
+		"description": "Low points raid with minimal loot",
+		"expected_drops": [
+			{
+				"item": "Teak plank",
+				"quantity": 8,
+				"confidence": "medium"
+			}
+		],
+		"expected_points": 18500,
+		"raid_type": "regular",
+		"completion_count": 234,
+		"date_completed": "2024-02-13T11:20:30",
+		"notes": "Low points raid - test edge case for point detection",
+		"difficulty": "medium"
+	},
+	{
+		"image_path": "validation_images/cox_cm_high_points.png",
+		"description": "High points Challenge Mode raid",
+		"expected_drops": [
+			{
+				"item": "Torn prayer scroll",
+				"quantity": 1,
+				"confidence": "high"
+			},
+			{
+				"item": "Dark relic",
+				"quantity": 2,
+				"confidence": "high"
+			}
+		],
+		"expected_points": 47500,
+		"raid_type": "cm",
+		"completion_count": 23,
+		"date_completed": "2024-02-19T15:55:18",
+		"notes": "High points CM raid for testing upper bounds",
+		"difficulty": "medium"
+	}
+]
