@@ -90,6 +90,18 @@ class COXPromptOptimizer:
             lm = dspy.LM("gemini/gemini-1.5-pro-latest")
             dspy.configure(lm=lm)
             self.dspy_lm = lm
+            # Add logging for LiteLLM Gemini URL
+            try:
+                import litellm
+                original_completion = litellm.completion
+                def debug_completion(*args, **kwargs):
+                    url = kwargs.get('url', None)
+                    if url:
+                        logger.info(f"LiteLLM Gemini completion URL: {url}")
+                    return original_completion(*args, **kwargs)
+                litellm.completion = debug_completion
+            except Exception as patch_exc:
+                logger.warning(f"Could not patch LiteLLM for URL logging: {patch_exc}")
             logger.info("DSPy configured with Gemini using modern LM interface")
             
         except Exception as e:
@@ -117,11 +129,11 @@ class COXPromptOptimizer:
             if 'private_key' in key_data:
                 # This is a service account file - extract the private key
                 logger.info(f"Loaded Gemini service account key from {key_file}")
-                return key_data['private_key']
+                return key_data['private_key'].strip()
             elif 'api_key' in key_data:
                 # This is a simple API key file
                 logger.info(f"Loaded Gemini API key from {key_file}")
-                return key_data['api_key']
+                return key_data['api_key'].strip()
             else:
                 logger.warning(f"No 'api_key' or 'private_key' field found in {key_file}")
                 return None
@@ -256,6 +268,7 @@ class COXPromptOptimizer:
                 response = example_vision_language_inference(
                     self.model, self.processor, image_path, prompt
                 )
+                logger.info(f"Inference result for image '{image_path}': {response}")
                 
                 # Parse response with robust parsing
                 analysis = self._parse_vlm_response(response)
