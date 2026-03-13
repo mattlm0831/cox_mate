@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Gallery</title>
+</head>
+<body>
+    <h1>Image Gallery</h1>
+    <a href="/">Back to Dashboard</a>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        {% for raid in raids %}
+        {% if raid.image_path %}
+        <div style="margin:5px;text-align:center;">
+            <a href="/screenshots/{{ raid.image_path|replace('\\','/')|replace('test_screenshots/','') }}" target="_blank">
+                <img src="/screenshots/{{ raid.image_path|replace('\\','/')|replace('test_screenshots/','') }}" width="150" style="display:block;"/>
+            </a>
+            <div>{{ raid.date_completed }}</div>
+            <div>Points: {{ raid.points }}</div>
+            <div>{% if raid.is_purple %}🟣{% else %}⚪{% endif %}</div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</body>
+</html>

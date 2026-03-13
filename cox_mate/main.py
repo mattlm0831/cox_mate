@@ -61,18 +61,54 @@ Allowed special loot names:
 - Dexterous prayer scroll
 
 Purple identification guidance:
-- Twisted bow: long green/white/black bow
-- Kodai insignia: blue geometric insignia, not a dark blob, not a potion-like item
-- Elder maul: large black maul
-- Ancestral hat: wizard hat
-- Ancestral robe top: robe torso
-- Ancestral robe bottom: robe legs
-- Dinh's bulwark: very large rectangular shield
-- Dragon hunter crossbow: crossbow with dragon-head styling
-- Twisted buckler: smaller green circular shield
-- Dragon claws: a pair of large red claws, not arrows, not a dark relic, not a stackable item
-- Arcane prayer scroll: pale scroll/paper
-- Dexterous prayer scroll: darker scroll/paper
+
+Twisted bow:
+A long bow with green and white coloration and a distinctive twisted organic shape.
+
+Kodai insignia:
+A bright electric-blue magical insignia with a symmetrical geometric star/sigil design.
+It has sharp triangular shapes and a glowing cyan/blue color.
+It looks like a magical emblem or rune symbol.
+
+Important:
+The Kodai insignia is NOT dark purple, black, or orb-shaped.
+
+Dark relic (NOT a purple):
+A dark purple/black rounded relic or orb-like item.
+It looks like a shadowy bulb or dark magical artifact.
+This item is NOT a Chambers of Xeric purple unique.
+
+If the item resembles a dark orb, dark relic, or shadowy purple object, it is NOT a Kodai insignia.
+
+Elder maul:
+A large black maul with a heavy rectangular hammer head.
+
+Ancestral hat:
+A magical wizard hat.
+
+Ancestral robe top:
+A magical robe torso.
+
+Ancestral robe bottom:
+Magical robe legs.
+
+Dinh's bulwark:
+A very large rectangular shield shaped like a door.
+
+Dragon hunter crossbow:
+A crossbow with dragon-head styling.
+
+Twisted buckler:
+A smaller circular green shield.
+
+Dragon claws:
+A pair of bright red claw weapons.
+
+Arcane prayer scroll:
+A pale parchment scroll.
+
+Dexterous prayer scroll:
+A slightly darker parchment scroll.
 
 Decision order:
 1. Read personal points from the top-right panel.
@@ -101,6 +137,17 @@ Rules:
 - Confidence must be conservative.
 - Do not include markdown fences.
 - Do not include extra keys.
+
+Very important classification rule:
+
+If an item is dark purple, black, orb-shaped, or resembles a relic artifact, it is NOT a Kodai insignia and NOT a purple unique.
+
+If uncertain between Kodai insignia and a dark relic or similar dark object, choose "not a purple".
+
+Purple uniques are rare rewards.
+Most raids do NOT contain a purple item.
+
+If you are not highly confident that an icon exactly matches a listed purple unique, return no purple.
 """.strip()
 
 schema = {
@@ -188,7 +235,8 @@ def extract_purple(items: dict[str, int]) -> str | None:
 @click.argument("photos", type=click.Path(path_type=Path, exists=True, file_okay=False))
 @click.argument("store", type=click.Path(path_type=Path), required=False)
 @click.option("--api-key", default=os.getenv("GEMINI_API_KEY"), help="API key for Google Generative AI")
-def cox_mate(photos: Path, store: Path | None, api_key: str) -> None:
+@click.option("--dry-run", is_flag=True, help="Process photos without saving results")
+def cox_mate(photos: Path, store: Path | None, api_key: str, dry_run: bool) -> None:
     if not photos.exists():
         raise ValueError("You must define a directory of photos")
 
@@ -201,9 +249,13 @@ def cox_mate(photos: Path, store: Path | None, api_key: str) -> None:
     else:
         df = pl.DataFrame(schema=schema)
 
-    photos_in_dir = [png.name for png in photos.glob("*.png")]
+    photos_in_dir = [png.name for png in photos.glob("*Chambers*.png")]
     already_processed = set(df.get_column("file_name").to_list()) if "file_name" in df.columns else set()
     processable_photos = set(photos_in_dir) - already_processed
+    if dry_run:
+        print(f"Found {len(photos_in_dir)} photos in directory, sample: {photos_in_dir[:5]}")
+        print(f"{len(already_processed)} already processed photos, would have processed {len(processable_photos)} new photos")
+        return
 
     client = genai.Client(api_key=api_key)
 
@@ -230,7 +282,7 @@ def cox_mate(photos: Path, store: Path | None, api_key: str) -> None:
         "required": ["points", "items"],
     }
 
-    for photo_name in sorted(processable_photos):
+    for i, photo_name in enumerate(processable_photos):
         image_path = photos / photo_name
         file_meta = parse_photo_metadata(photo_name)
 
@@ -269,19 +321,10 @@ def cox_mate(photos: Path, store: Path | None, api_key: str) -> None:
         row_df = pl.DataFrame([new_row]).cast(schema)
         df = pl.concat([df, row_df], how="vertical")
 
-        print(
-            json.dumps(
-                {
-                    "file_name": photo_name,
-                    "parsed_model_output": payload,
-                    "stored_row": new_row,
-                },
-                indent=2,
-                default=str,
-            )
-        )
+        print(f"Processed {photo_name}: {payload['points']} points, purple: {purple}, items: {items_json}")
+        print(f"Processed photo {i + 1} / {len(processable_photos)}")
+
+        if store:
+            df.write_csv(store)
 
     print(f"{len(processable_photos)} rows processed")
-
-    if store:
-        df.write_csv(store)

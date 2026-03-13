@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Points Over Time</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Points Over Time</h1>
+    <a href="/">Back to Dashboard</a>
+    <div id="chart" style="width:100%;height:500px;"></div>
+    <script>
+        var points = {{ points|tojson }};
+        var x = points.map(function(p) { return p[0]; });
+        var y = points.map(function(p) { return p[1]; });
+        Plotly.newPlot('chart', [{x: x, y: y, mode: 'lines+markers', name: 'Points'}], {title: 'Points Over Time', xaxis: {title: 'Date'}, yaxis: {title: 'Points'}});
+    </script>
+</body>
+</html>

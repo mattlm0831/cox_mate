@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Longest Dry Streaks</title>
+</head>
+<body>
+    <h1>Longest Dry Streaks</h1>
+    <a href="/">Back to Dashboard</a>
+    <p>Longest dry streak: <b>{{ longest }}</b> raids</p>
+    <h2>All dry streaks:</h2>
+    <ul>
+        {% for streak in streaks %}
+        <li>{{ streak }} raids</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

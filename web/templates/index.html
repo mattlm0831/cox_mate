@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>COX Mate - Dashboard</title>
+</head>
+<body>
+    <h1>COX Mate - Chambers of Xeric Stats</h1>
+    <nav>
+        <a href="/points">Points Over Time</a> |
+        <a href="/purples">Purple Drops Timeline</a> |
+        <a href="/gallery">Image Gallery</a> |
+        <a href="/dry_streaks">Longest Dry Streaks</a> |
+        <a href="/score">Score New Images</a>
+    </nav>
+    <h2>Recent Raids</h2>
+    <table border="1">
+        <tr><th>Date</th><th>Points</th><th>Purple?</th><th>Items</th><th>Image</th></tr>
+        {% for raid in raids[:20] %}
+        <tr>
+            <td>{{ raid.date_completed }}</td>
+            <td>{{ raid.points }}</td>
+            <td>{% if raid.is_purple %}🟣{% else %}⚪{% endif %}</td>
+            <td>{{ raid.item_list }}</td>
+            <td>{% if raid.image_path %}<a href="/screenshots/{{ raid.image_path|replace('\\','/')|replace('test_screenshots/','') }}" target="_blank">View</a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

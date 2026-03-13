@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Purple Drops Timeline</title>
+</head>
+<body>
+    <h1>Purple Drops Timeline</h1>
+    <a href="/">Back to Dashboard</a>
+    <ul>
+        {% for raid in purples %}
+        <li>{{ raid.date_completed }}: {{ raid.item_list }} {% if raid.image_path %}<a href="/screenshots/{{ raid.image_path|replace('\\','/')|replace('test_screenshots/','') }}" target="_blank">View</a>{% endif %}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
