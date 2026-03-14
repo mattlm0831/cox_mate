@@ -1,6 +1,13 @@
 # Cox Mate
 
-Cox Mate is a Python project designed to process images and interact with Google Generative AI. This project aims to make your cox tracking simple, if you like to use spreadsheet based drop analysis. This guide will help you set up the project and use the `cox_mate` script effectively. After setting it up and running it, you will be able to interact with your data in a csv. You should leave the .csv file in the root directory of the project, so on subsequent runs, it can only process new photos that have been added.
+Cox Mate is a Python project designed to process images and interact with Google Generative AI. This project aims to make your cox point tracking simple and persistent, if you like to use spreadsheet based drop analysis. This guide will help you set up the project and use the `cox_mate` script effectively. After setting it up and running it, you will be able to interact with your data in a csv. You should leave the .csv file in the root directory of the project, so on subsequent runs, it can only process new photos that have been added.
+
+Further versions will further develop the web/ directory to allow for a local streamlit mini app to interact with your data, and completion photos.
+
+## Things to note:
+
+- Currently item detection is hit or miss, most of the purple chests are identified but there will be false negatives and false positives.
+- If your screenshots do not have the points interface in the top right of your UI to the left of the map, you will need to modify the prompt in prompt.txt
 
 ## Prerequisites
 

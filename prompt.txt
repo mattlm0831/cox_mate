@@ -1,0 +1,131 @@
+This is an image from a Chambers of Xeric completion in Old School RuneScape.
+
+Your job is to extract:
+1. The current user's PERSONAL points.
+2. The loot the current user received.
+
+Important points rules:
+- The points interface is in the top right.
+- It contains a "Total:" row and a row for the current player beneath it.
+- Use the CURRENT PLAYER'S personal points, not the total.
+
+Important loot rules:
+- First use the chat box text to identify loot whenever possible.
+- If chat text clearly identifies an item, trust the chat.
+- If chat text does not identify the loot, inspect the reward interface carefully.
+
+Critical visual rule for purple detection:
+- In the reward interface, ordinary stackable loot often has a quantity number shown above the item icon.
+- Purple uniques should only be identified when the item icon itself clearly matches a known purple unique.
+- Do NOT identify an item as a purple unique just because it is dark, red, blue, rectangular, or vaguely similar.
+- Do NOT guess.
+- If an item has a visible quantity number over it, treat it as ordinary loot unless the icon is unmistakably a known unique confirmed by the item art.
+- If the icon is ambiguous, unknown, partially obscured, too small, or not clearly one of the listed uniques, do NOT call it a purple.
+
+Very important:
+- Individual reward items do NOT have numbers in the top-right corner of the item icon area unless they are stackable loot quantities.
+- A visible quantity on the item strongly suggests normal loot, not a purple unique.
+- If chat does not validate the item and the reward icon is not unmistakably one of the listed purple items, return no item for that slot.
+
+Allowed special loot names:
+- Twisted bow
+- Kodai insignia
+- Elder maul
+- Ancestral hat
+- Ancestral robe top
+- Ancestral robe bottom
+- Dinh's bulwark
+- Dragon hunter crossbow
+- Twisted buckler
+- Dragon claws
+- Arcane prayer scroll
+- Dexterous prayer scroll
+
+Purple identification guidance:
+
+Twisted bow:
+A long bow with green and white coloration and a distinctive twisted organic shape.
+
+Kodai insignia:
+A bright electric-blue magical insignia with a symmetrical geometric star/sigil design.
+It has sharp triangular shapes and a glowing cyan/blue color.
+It looks like a magical emblem or rune symbol.
+
+Important:
+The Kodai insignia is NOT dark purple, black, or orb-shaped.
+
+Dark relic (NOT a purple):
+A dark purple/black rounded relic or orb-like item.
+It looks like a shadowy bulb or dark magical artifact.
+This item is NOT a Chambers of Xeric purple unique.
+
+If the item resembles a dark orb, dark relic, or shadowy purple object, it is NOT a Kodai insignia.
+
+Elder maul:
+A large black maul with a heavy rectangular hammer head.
+
+Ancestral hat:
+A magical wizard hat.
+
+Ancestral robe top:
+A magical robe torso.
+
+Ancestral robe bottom:
+Magical robe legs.
+
+Dinh's bulwark:
+A very large rectangular shield shaped like a door.
+
+Dragon hunter crossbow:
+A crossbow with dragon-head styling.
+
+Twisted buckler:
+A smaller circular green shield.
+
+Dragon claws:
+A pair of bright red claw weapons.
+
+Arcane prayer scroll:
+A pale parchment scroll.
+
+Dexterous prayer scroll:
+A slightly darker parchment scroll.
+
+Decision order:
+1. Read personal points from the top-right panel.
+2. Check chat for explicit loot text.
+3. If chat does not confirm loot, only identify a purple if the icon is unmistakable.
+4. If not unmistakable, return no purple item.
+
+Return ONLY valid JSON in this exact shape:
+{
+  "points": 64553,
+  "items": []
+}
+
+or for identified items:
+{
+  "points": 64553,
+  "items": [
+    {"item_name": "Twisted bow", "quantity": 1}
+  ]
+}
+
+Rules:
+- "points" must be an integer.
+- "items" must be an array of objects with keys "item_name" and "quantity".
+- If loot is not confidently identifiable, return an empty items array.
+- Confidence must be conservative.
+- Do not include markdown fences.
+- Do not include extra keys.
+
+Very important classification rule:
+
+If an item is dark purple, black, orb-shaped, or resembles a relic artifact, it is NOT a Kodai insignia and NOT a purple unique.
+
+If uncertain between Kodai insignia and a dark relic or similar dark object, choose "not a purple".
+
+Purple uniques are rare rewards.
+Most raids do NOT contain a purple item.
+
+If you are not highly confident that an icon exactly matches a listed purple unique, return no purple.
