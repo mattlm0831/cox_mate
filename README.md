@@ -1,6 +1,6 @@
 # Cox Mate
 
-Cox Mate is a Python project designed to process images and interact with Google Generative AI. This guide will help you set up the project and use the `cox_mate` script effectively.
+Cox Mate is a Python project designed to process images and interact with Google Generative AI. This project aims to make your cox tracking simple, if you like to use spreadsheet based drop analysis. This guide will help you set up the project and use the `cox_mate` script effectively. After setting it up and running it, you will be able to interact with your data in a csv. You should leave the .csv file in the root directory of the project, so on subsequent runs, it can only process new photos that have been added.
 
 ## Prerequisites
 
