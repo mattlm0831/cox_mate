@@ -9,6 +9,10 @@ Further versions will further develop the web/ directory to allow for a local st
 - Currently item detection is hit or miss, most of the purple chests are identified but there will be false negatives and false positives.
 - If your screenshots do not have the points interface in the top right of your UI to the left of the map, you will need to modify the prompt in prompt.txt to tell it more about your interface.
 - I suggest running this on a subset of your boss kills to get a baseline, then modify as you see fit. If you think the prompt can be further improved, please make a pr.
+- Whenever you want to update your tracking, run the script and it will pick up all the newest completions.
+- This will cost you money, and you will need a gemini API key to run the script. You can get one at https://aistudio.google.com/. I have done over 1,000 images for around $3.50. Your mileage may vary.
+- This project uses Gemini, if you have another model you would like to try, feel to fork, or contribute! I cannot guarantee that any model will work.
+- I experimented originally with Qwen 2.5VL as a local VLM to accomplish this, but inference was very slow, and results were rather poor. Feel free to contribute for this option, but hardware variance will make that experience very hard to standardize.
 
 ## Prerequisites
 
