@@ -232,24 +232,23 @@ def extract_purple(items: dict[str, int]) -> str | None:
 
 
 @click.command("cox_mate")
-@click.argument("photos", type=click.Path(path_type=Path, exists=True, file_okay=False))
-@click.argument("store", type=click.Path(path_type=Path), required=False)
+@click.argument("photos_dir", type=click.Path(path_type=Path, exists=True, file_okay=False))
+@click.option("--store", default="./data.csv", help="Path to the CSV file for storing data. Defaults to ./data.csv.")
 @click.option("--api-key", default=os.getenv("GEMINI_API_KEY"), help="API key for Google Generative AI")
-@click.option("--dry-run", is_flag=True, help="Process photos without saving results")
-def cox_mate(photos: Path, store: Path | None, api_key: str, dry_run: bool) -> None:
-    if not photos.exists():
+@click.option("--dry-run", is_flag=True, help="Process photos_dir without saving results")
+def cox_mate(photos_dir: Path, store: str, api_key: str, dry_run: bool) -> None:
+    if not photos_dir.exists():
         raise ValueError("You must define a directory of photos")
 
-    if store and store.exists():
-        df = pl.read_csv(
-            store,
-            try_parse_dates=True,
-            schema_overrides=schema
-        )
+    store_path = Path(store)
+
+    if store_path.exists():
+        df = pl.read_csv(store_path)
     else:
         df = pl.DataFrame(schema=schema)
+        df.write_csv(store_path)
 
-    photos_in_dir = [png.name for png in photos.glob("*Chambers*.png")]
+    photos_in_dir = [png.name for png in photos_dir.glob("*Chambers*.png")]
     already_processed = set(df.get_column("file_name").to_list()) if "file_name" in df.columns else set()
     processable_photos = set(photos_in_dir) - already_processed
     if dry_run:
@@ -283,7 +282,7 @@ def cox_mate(photos: Path, store: Path | None, api_key: str, dry_run: bool) -> N
     }
 
     for i, photo_name in enumerate(processable_photos):
-        image_path = photos / photo_name
+        image_path = photos_dir / photo_name
         file_meta = parse_photo_metadata(photo_name)
 
         with open(image_path, "rb") as f:
