@@ -106,11 +106,11 @@ The `cox_mate` script processes images and interacts with Google Generative AI. 
 2. Run the script:
 
    ```bash
-   python -m cox_mate.cox_mate <photos-directory> --store <store-file> --api-key <your-api-key>
+   python -m cox_mate.cox_mate <photos-directory> --api-key <your-api-key>
    ```
 
    - `<photos-directory>`: Path to the directory containing `.png` images.
-   - `--store`: (Optional) Path to the CSV file where processed data will be stored. Defaults to `./data.csv`. If the file does not exist, it will be created with the defined schema. If you choose a different path, you must specify it on each run.
+   - `--store`: (Optional) Path to the CSV file where processed data will be stored. Defaults to `./data.csv`. If the file does not exist, it will be created with the defined schema. If you choose a different path, you must specify it on each run. I suggest you let the script manage the storage file location, as its less verbose this way.
    - `--api-key`: Your Google Generative AI API key. If not provided, the script will use the `GEMINI_API_KEY` environment variable.
 
 ## Example
