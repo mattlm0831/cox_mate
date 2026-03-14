@@ -7,7 +7,8 @@ Further versions will further develop the web/ directory to allow for a local st
 ## Things to note:
 
 - Currently item detection is hit or miss, most of the purple chests are identified but there will be false negatives and false positives.
-- If your screenshots do not have the points interface in the top right of your UI to the left of the map, you will need to modify the prompt in prompt.txt
+- If your screenshots do not have the points interface in the top right of your UI to the left of the map, you will need to modify the prompt in prompt.txt to tell it more about your interface.
+- I suggest running this on a subset of your boss kills to get a baseline, then modify as you see fit. If you think the prompt can be further improved, please make a pr.
 
 ## Prerequisites
 
