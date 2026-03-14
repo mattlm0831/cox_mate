@@ -20,7 +20,6 @@ Before you begin, ensure you have the following installed on your system:
 
 1. **Python 3.8 or higher**
 2. **Poetry** (Python dependency management tool)
-3. **Google Generative AI SDK**
 
 ## Setting Up Poetry
 
