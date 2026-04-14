@@ -5,7 +5,8 @@ import re
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-
+from dotenv import load_dotenv
+load_dotenv()
 import polars as pl
 from polars import datatypes as dt
 from google import genai
@@ -24,26 +25,8 @@ schema = {
     "points": dt.Int64,
     "date_completed": dt.Date,
     "date_processed": dt.Date,
-    "purple": dt.Utf8,
-    "items_json": dt.Utf8,
     "completion_count": dt.Int64,
     "raid_type": dt.Categorical,
-}
-
-
-PURPLE_ITEMS = {
-    "Twisted bow",
-    "Kodai insignia",
-    "Elder maul",
-    "Ancestral hat",
-    "Ancestral robe top",
-    "Ancestral robe bottom",
-    "Dinh's bulwark",
-    "Dragon hunter crossbow",
-    "Twisted buckler",
-    "Dragon claws",
-    "Arcane prayer scroll",
-    "Dexterous prayer scroll",
 }
 
 
@@ -73,52 +56,36 @@ def parse_photo_metadata(file_name: str) -> dict:
     }
 
 
-def normalize_items(items: list[dict] | None) -> dict[str, int]:
-    if not items:
-        return {}
 
-    normalized: dict[str, int] = {}
+@click.group()
+def cli():
+    """COX Mate CLI: process images and view stats."""
+    pass
 
-    for entry in items:
-        if not entry:
-            continue
-
-        item_name = str(entry["item_name"]).strip()
-        quantity = int(entry["quantity"])
-
-        normalized[item_name] = normalized.get(item_name, 0) + quantity
-
-    return normalized
-
-
-def extract_purple(items: dict[str, int]) -> str | None:
-    found = [item for item in items if item in PURPLE_ITEMS]
-    if not found:
-        return None
-    if len(found) == 1:
-        return found[0]
-    return ", ".join(sorted(found))
-
-
-@click.command("cox_mate")
-@click.argument("photos_dir", type=click.Path(path_type=Path, exists=True, file_okay=False))
-@click.option("--store", default="./data.csv", help="Path to the CSV file for storing data. Defaults to ./data.csv.")
+@cli.command("process")
+@click.argument("photos_dir", type=click.Path(path_type=Path, exists=True, file_okay=False), default=Path(os.getenv("PHOTOS_DIR", '')), nargs=1)
+@click.option("--store", default=os.getenv('STORE_PATH', './data.csv'), help="Path to the CSV file for storing data. Defaults to ./data.csv.")
 @click.option("--api-key", default=os.getenv("GEMINI_API_KEY"), help="API key for Google Generative AI")
 @click.option("--dry-run", is_flag=True, help="Process photos_dir without saving results")
-def cox_mate(photos_dir: Path, store: str, api_key: str, dry_run: bool) -> None:
-    if not photos_dir.exists():
+def process(photos_dir: Path, store: str, api_key: str, dry_run: bool) -> None:
+    if not photos_dir or not photos_dir.exists():
         raise ValueError("You must define a directory of photos")
 
-    store_path = Path(store)
+    store_path = Path(store).expanduser().resolve()
+    print(f"[INFO] Using store path: {store_path}")
 
-    if store_path.exists():
-        df = pl.read_csv(store_path)
+    if store and store_path.exists():
+        df = pl.read_csv(str(store_path), separator=",", encoding="utf8")
+        print("Existing data file found, loaded into DataFrame.")
+    elif store:
+        raise ValueError(f"No data file found at {store_path}, please create an empty CSV with the correct schema or run without the store argument")
     else:
         df = pl.DataFrame(schema=schema)
-        df.write_csv(store_path)
+        print("No existing data file found, starting with an empty DataFrame.")
 
     photos_in_dir = [png.name for png in photos_dir.glob("*Chambers*.png")]
     already_processed = set(df.get_column("file_name").to_list()) if "file_name" in df.columns else set()
+
     processable_photos = set(photos_in_dir) - already_processed
     if dry_run:
         print(f"Found {len(photos_in_dir)} photos in directory, sample: {photos_in_dir[:5]}")
@@ -134,20 +101,8 @@ def cox_mate(photos_dir: Path, store: str, api_key: str, dry_run: bool) -> None:
                 "type": "integer",
                 "description": "The personal points for the current user, not the total team points.",
             },
-            "items": {
-                "type": "array",
-                "description": "Loot received by the current user.",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "item_name": {"type": "string"},
-                        "quantity": {"type": "integer"},
-                    },
-                    "required": ["item_name", "quantity"],
-                },
-            },
         },
-        "required": ["points", "items"],
+        "required": ["points"],
     }
 
     for i, photo_name in enumerate(processable_photos):
@@ -171,28 +126,57 @@ def cox_mate(photos_dir: Path, store: str, api_key: str, dry_run: bool) -> None:
         )
 
         payload = json.loads(response.text)
-        items = normalize_items(payload.get("items"))
-        purple = extract_purple(items)
-        items_json = json.dumps(items, sort_keys=True)
 
         new_row = {
             "file_name": photo_name,
             "points": int(payload["points"]),
             "date_completed": file_meta["date_completed"],
             "date_processed": date.today(),
-            "purple": purple,
-            "items_json": items_json,
             "completion_count": file_meta["completion_count"],
             "raid_type": file_meta["raid_type"],
         }
 
         row_df = pl.DataFrame([new_row]).cast(schema)
+        # Ensure both date_completed and date_processed columns are the same type in both DataFrames
+        df = df.with_columns([
+            pl.col("date_completed").cast(pl.Date),
+            pl.col("date_processed").cast(pl.Date),
+            pl.col("raid_type").cast(pl.Categorical)
+        ])
+        row_df = row_df.with_columns([
+            pl.col("date_completed").cast(pl.Date),
+            pl.col("date_processed").cast(pl.Date),
+            pl.col("raid_type").cast(pl.Categorical)
+        ])
         df = pl.concat([df, row_df], how="vertical")
 
-        print(f"Processed {photo_name}: {payload['points']} points, purple: {purple}, items: {items_json}")
+        print(f"Processed {photo_name}: {payload['points']} points")
         print(f"Processed photo {i + 1} / {len(processable_photos)}")
 
+
         if store:
-            df.write_csv(store)
+            try:
+                df.write_csv(str(store_path))
+                print(f"[INFO] DataFrame written to {store_path}")
+            except Exception as e:
+                print(f"[ERROR] Failed to write DataFrame to {store_path}: {e}")
 
     print(f"{len(processable_photos)} rows processed")
+
+@cli.command("stats")
+@click.option("--store", default=os.getenv('STORE_PATH', './data.csv'), help="Path to the CSV file for storing data. Defaults to ./data.csv.")
+def stats(store: str):
+    """Print rough statistics from the data store CSV."""
+    store_path = Path(store).expanduser().resolve()
+    print(f"[INFO] Using store path: {store_path}")
+    if not store_path.exists():
+        print(f"No data file found at {store_path}")
+        return
+    df = pl.read_csv(str(store_path), separator=",", encoding="utf8")
+    print(f"Loaded {len(df)} rows from {store_path}")
+    total_raids = len(df)
+    total_points = df["points"].sum()
+    avg_points = df["points"].mean()
+    print(f"Total raids: {total_raids:,}")
+    print(f"Total points: {total_points:,}")
+    print(f"Average points per raid: {avg_points:,.2f}")
